@@ -122,7 +122,7 @@ namespace warno
                         if (Directory.GetFiles(ModPacks + ModsS[i] + @"\DatasMap", "*", SearchOption.TopDirectoryOnly).Length > 0)
                         {
                             Array.Resize(ref ModList, ModList.Length + 1);
-                            ModList[ModList.Length - 1] = ModsW[i];
+                            ModList[ModList.Length - 1] = ModsS[i];
                         }
                     }
                 }
@@ -336,18 +336,279 @@ namespace warno
                 }
 
             }
-            Console.WriteLine();
             #endregion
 
             // 6. Update map mods with new packed data 
             #region Version Number Update
             Console.WriteLine("Continue with updating mod folder files? (y/n)");
             string controlInputE = Console.ReadLine();
+
             if (controlInputE == "y")
             {
                 // Each folder is updated individually to ease algorithm complexity and my lazyness :)
+                for (int i = 0; i < ModList.Length; i++)
+                {
+                    // DecorsSets
+                    string[] decorFiles = Directory.GetFiles(ModPacks + ModList[i] + @"\DecorsSets", "*", SearchOption.TopDirectoryOnly);
+                    if(decorFiles.Length > 0)
+                    {
+                        
+                        for (int j = 0; j < decorFiles.Length; j++)
+                        {
+                            FileInfo filInfo = new FileInfo(decorFiles[j]);
+                            string fileNameBuffer = DecorPacks+filInfo.Name;
+                            if (File.Exists(fileNameBuffer))
+                            {
+                                File.Copy(fileNameBuffer, decorFiles[j], true);
+                                //Console.WriteLine(" Copy file from " + fileNameBuffer + " to " + decorFiles[j]);
+                            }
+                        }
+                    }
+
+                    // DatasMap
+                    string[] dataMapFiles = Directory.GetFiles(ModPacks + ModList[i] + @"\DatasMap", "*", SearchOption.TopDirectoryOnly);
+                    if (dataMapFiles.Length > 0)
+                    {
+
+                        for (int j = 0; j < dataMapFiles.Length; j++)
+                        {
+                            FileInfo filInfo = new FileInfo(dataMapFiles[j]);
+                            string fileNameBuffer = DatasMap + filInfo.Name;
+                            if (File.Exists(fileNameBuffer))
+                            {
+                                File.Copy(fileNameBuffer, dataMapFiles[j], true);
+                            }
+                        }
+                    }
+
+
+                    // Maps
+                    string[] MappackFiles = Directory.GetFiles(ModPacks + ModList[i] + @"\Maps", "*", SearchOption.TopDirectoryOnly);
+                    if (MappackFiles.Length > 0)
+                    {
+
+                        for (int j = 0; j < MappackFiles.Length; j++)
+                        {
+                            FileInfo filInfo = new FileInfo(MappackFiles[j]);
+                            string fileNameBuffer = MapsPacks + filInfo.Name;
+                            if (File.Exists(fileNameBuffer))
+                            {
+                                File.Copy(fileNameBuffer, MappackFiles[j], true);
+                            }
+                        }
+                    }
+
+                    // Scenarios
+                    string[] PackScenarioFiles = Directory.GetFiles(ModPacks + ModList[i] + @"\Scenarios", "*", SearchOption.TopDirectoryOnly);
+                    if (PackScenarioFiles.Length > 0)
+                    {
+
+                        for (int j = 0; j < PackScenarioFiles.Length; j++)
+                        {
+                            FileInfo filInfo = new FileInfo(PackScenarioFiles[j]);
+                            string fileNameBuffer = ScenarioPacks + filInfo.Name;
+                            if (File.Exists(fileNameBuffer))
+                            {
+                                File.Copy(fileNameBuffer, PackScenarioFiles[j], true);
+                            }
+                        }
+                    }
+                }
+
+
             }
             #endregion
+
+            // 7. Update map mods base structure 
+            #region Update Mod Base File
+            Console.WriteLine("Continue with updating map mod gen files? (y/n)");
+            string controlInputF = Console.ReadLine();
+
+            if (controlInputF == "y")
+            {
+                for (int i = 0; i < ModList.Length; i++)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine(" Updating: " + ModList[i]);
+                    Console.WriteLine(" ...");
+                    Process baking = new Process();
+                    // Configure the process using the StartInfo properties.
+                    baking.StartInfo.FileName = Mods_Directory + ModList[i] + @"\UpdateMod.bat";
+                    baking.StartInfo.Arguments = "/C ";
+                    baking.StartInfo.CreateNoWindow = true;
+                    baking.StartInfo.UseShellExecute = false;
+                    baking.StartInfo.RedirectStandardOutput = true;
+                    baking.StartInfo.RedirectStandardError = true;
+                    baking.StartInfo.RedirectStandardInput = true;
+                    baking.EnableRaisingEvents = true;
+
+                    baking.OutputDataReceived += (object sender, DataReceivedEventArgs e) =>
+                    {
+                        if (e.Data != null)
+                            Console.WriteLine("Updating Gen Files... " + e.Data);
+                    };
+
+
+                    baking.ErrorDataReceived += (object sender, DataReceivedEventArgs e) =>
+                    {
+                        if (e.Data != null)
+                            Console.WriteLine("Error during Update: " + e.Data);
+                    };
+                    baking.Start();
+                    baking.StandardInput.Close();
+                    baking.BeginOutputReadLine();
+                    baking.BeginErrorReadLine();
+                    await baking.WaitForExitAsync();
+                    //process.WaitForExit();// Waits here for the process to exit.
+
+                    if (baking.ExitCode == 0)
+                    {
+                        Console.WriteLine("Gen File Update successfull for: " + ModList[i]);
+                        Console.WriteLine();
+                        baking.Close();
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error during Gen File Update for: " + ModList[i]);
+                        Console.WriteLine();
+                        baking.Close();
+                    }
+
+
+                }
+
+            }
+            #endregion
+
+            // 8. Update map mods base structure 
+            #region Generate Mod Base File
+            Console.WriteLine("Continue with generating map mod gen files? (y/n)");
+            string controlInputG = Console.ReadLine();
+
+            if (controlInputG == "y")
+            {
+                for (int i = 0; i < ModList.Length; i++)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine(" Generating files for: " + ModList[i]);
+                    Console.WriteLine(" ...");
+                    Process baking = new Process();
+                    // Configure the process using the StartInfo properties.
+                    baking.StartInfo.FileName = Mods_Directory + ModList[i] + @"\GenerateMod.bat";
+                    baking.StartInfo.Arguments = "/C ";
+                    baking.StartInfo.CreateNoWindow = true;
+                    baking.StartInfo.UseShellExecute = false;
+                    baking.StartInfo.RedirectStandardOutput = true;
+                    baking.StartInfo.RedirectStandardError = true;
+                    baking.StartInfo.RedirectStandardInput = true;
+                    baking.EnableRaisingEvents = true;
+
+                    baking.OutputDataReceived += (object sender, DataReceivedEventArgs e) =>
+                    {
+                        if (e.Data != null)
+                            Console.WriteLine("Generating Files... " + e.Data);
+                    };
+
+
+                    baking.ErrorDataReceived += (object sender, DataReceivedEventArgs e) =>
+                    {
+                        if (e.Data != null)
+                            Console.WriteLine("Error during File Generation: " + e.Data);
+                    };
+                    baking.Start();
+                    baking.StandardInput.Close();
+                    baking.BeginOutputReadLine();
+                    baking.BeginErrorReadLine();
+                    await baking.WaitForExitAsync();
+                    //process.WaitForExit();// Waits here for the process to exit.
+
+                    if (baking.ExitCode == 0)
+                    {
+                        Console.WriteLine("Generating files successfull for: " + ModList[i]);
+                        Console.WriteLine();
+                        baking.Close();
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error during file Generation for: " + ModList[i]);
+                        Console.WriteLine();
+                        baking.Close();
+                    }
+
+
+                }
+
+            }
+            #endregion
+
+            // 9. Upload map mods  
+            #region Upload Map Mod Base
+            Console.WriteLine("Continue with uploading map mods? (y/n)");
+            string controlInputH = Console.ReadLine();
+
+            if (controlInputH == "y")
+            {
+                for (int i = 0; i < ModList.Length; i++)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine(" Uploading: " + ModList[i]);
+                    Console.WriteLine(" ...");
+                    Process baking = new Process();
+                    // Configure the process using the StartInfo properties.
+                    baking.StartInfo.FileName = Mods_Directory + ModList[i] + @"\UploadMod.bat";
+                    baking.StartInfo.Arguments = "/C ";
+                    baking.StartInfo.CreateNoWindow = true;
+                    baking.StartInfo.UseShellExecute = false;
+                    baking.StartInfo.RedirectStandardOutput = true;
+                    baking.StartInfo.RedirectStandardError = true;
+                    baking.StartInfo.RedirectStandardInput = true;
+                    baking.EnableRaisingEvents = true;
+
+                    baking.OutputDataReceived += (object sender, DataReceivedEventArgs e) =>
+                    {
+                        if (e.Data != null)
+                            Console.WriteLine("Uploading Mod... " + e.Data);
+                    };
+
+
+                    baking.ErrorDataReceived += (object sender, DataReceivedEventArgs e) =>
+                    {
+                        if (e.Data != null)
+                            Console.WriteLine("Error during Upload: " + e.Data);
+                    };
+                    baking.Start();
+                    baking.StandardInput.Close();
+                    baking.BeginOutputReadLine();
+                    baking.BeginErrorReadLine();
+                    await baking.WaitForExitAsync();
+                    //process.WaitForExit();// Waits here for the process to exit.
+
+                    if (baking.ExitCode == 0)
+                    {
+                        Console.WriteLine("Upload successfull for: " + ModList[i]);
+                        Console.WriteLine();
+                        baking.Close();
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error during Upload for: " + ModList[i]);
+                        Console.WriteLine();
+                        baking.Close();
+                    }
+
+
+                }
+
+            }
+            #endregion
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine("----------------- WARNO Map Batch Update Finished! -----------------");
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
+
         }
     }
 }
