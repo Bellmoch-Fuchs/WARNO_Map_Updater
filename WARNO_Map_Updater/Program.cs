@@ -433,7 +433,8 @@ namespace warno
                     Console.WriteLine(" ...");
                     Process baking = new Process();
                     // Configure the process using the StartInfo properties.
-                    baking.StartInfo.FileName = Mods_Directory + ModList[i] + @"\UpdateMod.bat";
+                    baking.StartInfo.FileName = Mods_Directory + @"\" + ModList[i] + @"\UpdateMod.bat";
+                    Directory.SetCurrentDirectory(Mods_Directory + @"\" + ModList[i]);
                     baking.StartInfo.Arguments = "/C ";
                     baking.StartInfo.CreateNoWindow = true;
                     baking.StartInfo.UseShellExecute = false;
@@ -492,9 +493,11 @@ namespace warno
                     Console.WriteLine();
                     Console.WriteLine(" Generating files for: " + ModList[i]);
                     Console.WriteLine(" ...");
+                    Directory.SetCurrentDirectory(Mods_Directory + ModList[i]);
                     Process baking = new Process();
                     // Configure the process using the StartInfo properties.
-                    baking.StartInfo.FileName = Mods_Directory + ModList[i] + @"\GenerateMod.bat";
+                    baking.StartInfo.FileName = Mods_Directory + @"\" +ModList[i] + @"\GenerateMod.bat";
+                    Directory.SetCurrentDirectory(Mods_Directory + @"\" + ModList[i]);
                     baking.StartInfo.Arguments = "/C ";
                     baking.StartInfo.CreateNoWindow = true;
                     baking.StartInfo.UseShellExecute = false;
@@ -553,9 +556,11 @@ namespace warno
                     Console.WriteLine();
                     Console.WriteLine(" Uploading: " + ModList[i]);
                     Console.WriteLine(" ...");
+                    Directory.SetCurrentDirectory(Mods_Directory + ModList[i]);
                     Process baking = new Process();
                     // Configure the process using the StartInfo properties.
-                    baking.StartInfo.FileName = Mods_Directory + ModList[i] + @"\UploadMod.bat";
+                    baking.StartInfo.FileName = Mods_Directory + @"\" + ModList[i] + @"\UploadMod.bat";
+                    Directory.SetCurrentDirectory(Mods_Directory + @"\" + ModList[i]);
                     baking.StartInfo.Arguments = "/C ";
                     baking.StartInfo.CreateNoWindow = true;
                     baking.StartInfo.UseShellExecute = false;
