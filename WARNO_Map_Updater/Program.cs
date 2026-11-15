@@ -366,7 +366,7 @@ namespace warno
                     }
 
                     // DatasMap
-                    string[] dataMapFiles = Directory.GetFiles(ModPacks + ModList[i] + @"\DatasMap", "*", SearchOption.TopDirectoryOnly);
+                    string[] dataMapFiles = Directory.GetFiles(ModPacks + ModList[i] + @"\Maps", "*", SearchOption.TopDirectoryOnly);
                     if (dataMapFiles.Length > 0)
                     {
 
